@@ -51,7 +51,7 @@
     return 10;
 }
 
--(UITableViewCell *) tableVIew:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+-(UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Dynamic Prototypes
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CELL_ID"];
