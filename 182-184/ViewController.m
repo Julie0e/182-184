@@ -9,11 +9,36 @@
 #import "ViewController.h"
 
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate>
+{
+    NSMutableArray *data;
+}
 @property (weak, nonatomic) IBOutlet UITableView *table;
 
 @end
 
 @implementation ViewController
+
+-(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *) alertView
+{
+    //입력 문자열 길이가 2보다 클 때만 추가 가능
+    NSString *inputStr = [alertView textFieldAtIndex:0].text;
+    return [inputStr length] >2;
+}
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if(buttonIndex == alertView.firstOtherButtonIndex) {
+        UITextField *newStr = [alertView textFieldAtIndex:0];
+        if(newStr.text.length > 0) {
+            [data addObject:newStr.text];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:([data count]-1) inSection:0];
+            NSArray *row = [NSArray arrayWithObject:indexPath];
+            [self.table insertRowsAtIndexPaths:row withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
+        
+    }
+    
+}
 
 - (IBAction)toggleEdit:(id)sender
 {
@@ -38,31 +63,39 @@
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (UITableViewCellEditingStyleDelete == editingStyle) {
-        NSLog(@"%ld 번째삭제", indexPath.row);
+        //테이블 삭제
+        [data removeObjectAtIndex:indexPath.row];
+        // 테이블 셀삭제
+        NSArray *rowList = [NSArray arrayWithObjects:indexPath];
+        [tableView deleteRowsAtIndexPaths:rowList withRowAnimation:UITableViewRowAnimationAutomatic];
+        //NSLog(@"%d 번째삭제", (int)indexPath.row);
     }
     else
     {
-        NSLog(@"%ld 번째추가", indexPath.row);
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"추가" message:nil delegate:self cancelButtonTitle:@"취소" otherButtonTitles:@"확인", nil];
+        alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+        [alert show];
+        //NSLog(@"%d 번째추가", (int)indexPath.row);
     }
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 10;
+    return [data count];
 }
 
 -(UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Dynamic Prototypes
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CELL_ID"];
-    cell.textLabel.text = [NSString stringWithFormat:@"Cell %ld", indexPath.row];
+    cell.textLabel.text = [NSString stringWithFormat:@"Cell %d", (int)indexPath.row];
     return cell;
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+	data = [[NSMutableArray alloc]initWithObjects:@"item1", @"item2", @"item3", @"item4", @"item5", @"item6", @"item7", nil];
 }
 
 - (void)didReceiveMemoryWarning
